@@ -1,35 +1,32 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+//using System;
+//using System.IO;
+//using System.Threading.Tasks;
+//using Microsoft.AspNetCore.Mvc;
+//using Microsoft.Azure.WebJobs;
+//using Microsoft.AspNetCore.Http;
+//using Microsoft.Extensions.Logging;
+//using Newtonsoft.Json;
+//using Microsoft.Azure.Functions.Worker;
 
-namespace Cmms.Functions
-{
-    public static class TestRequest
-    {
-        [FunctionName("TestRequest")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
-        {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+//namespace Cmms.Functions
+//{
+//    public static class TestRequest
+//    {
+//        [FunctionName("TestRequest")]
+//        public static async Task<IActionResult> Run(
+//            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+//            ILogger log)
+//        {
+//            log.LogInformation("222 C# Application Insight Log Test");
+//            log.LogInformation("222 this is a information message...");
+//            log.LogWarning("222 this is a warning message...");
 
-            string name = req.Query["name"];
+//            String name = "";
+          
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+//            string responseMessage = $"Hello, {name} with User ID. This is Test Level function for authorizing";
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-            return new OkObjectResult(responseMessage);
-        }
-    }
-}
+//            return new OkObjectResult(responseMessage);
+//        }
+//    }
+//}
