@@ -8,8 +8,9 @@ namespace Cmms.Core.Domain
 {
     public class SparePart
     {
-       public Guid Id { set; get; }
+        public Guid Id { set; get; }
         public string PartName { set; get; }
+        public int UseCount { set; get; }
         public string Description { set; get; }
     }
 }

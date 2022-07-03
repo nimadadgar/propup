@@ -10,6 +10,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
 using Cmms.Core.Application.Services;
+using System.Reflection;
+using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;
+using Cmms.Core.Application;
+using Microsoft.Azure.Functions.Worker.Configuration;
 
 public class Program
 {
@@ -22,17 +26,23 @@ public class Program
         var host = new HostBuilder()
           .ConfigureAppConfiguration((hostContext, config) =>
           {
-          })
+          }).ConfigureOpenApi()
+                          
+
              .ConfigureFunctionsWorkerDefaults(workerApplication =>
              {
 
                  // Register our custom middlewares with the worker
                  workerApplication.UseMiddleware<ExceptionHandlingMiddleware>();
-                 workerApplication.UseMiddleware<ClaimsPrincipalMiddleware>();
+                 workerApplication.UseMiddleware<AuthenticateMiddleware>();
+                 workerApplication.UseMiddleware<AuthorizeMiddleware>();
+
 
              })
             .ConfigureServices((context, services) =>
             {
+              
+
                 services.AddLogging();
 
                 services.AddSingleton<IClaimsPrincipalAccessor, ClaimsPrincipalAccessor>();
@@ -49,11 +59,12 @@ public class Program
                         );
 
 
-
                 // logger.LogError(Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY"));
 
 
-
+                services.AddScoped<IEquipmentService, EquipmentService>();
+                services.AddScoped<IUserService, UserService>();
+                services.AddScoped<ITeamService, TeamService>();
 
 
                 //services.AddApplicationInsightsTelemetry(opts =>
@@ -77,16 +88,42 @@ public class Program
                     opt.UseCosmos(
                 Environment.GetEnvironmentVariable("COSMOS_ENDPOINT"),
                 Environment.GetEnvironmentVariable("COSMOS_EACCOUNTKEY"),
-
                 databaseName: "propupcmmsdb");
-
                 });
-
                       services.AddScoped<IUnitOfWork, ApplicationContext>();
-
-
             })
             .Build();
+
+        try
+        {
+            var opt = new DbContextOptionsBuilder<ApplicationContext>();
+
+            opt.UseCosmos(
+                   Environment.GetEnvironmentVariable("COSMOS_ENDPOINT"),
+                   Environment.GetEnvironmentVariable("COSMOS_EACCOUNTKEY"),
+                   databaseName: "propupcmmsdb"
+                );
+            ApplicationContext ctx = new ApplicationContext(opt.Options);
+
+           //var client= ctx.Database.GetCosmosClient();
+           //var container= client.GetContainer("propupcmmsdb", "teamGroup");
+
+           //await container.DeleteContainerAsync();
+
+
+            ////ctx.Database.EnsureDeleted();
+            ////ctx.Database.EnsureCreated();
+
+            //ctx.Database.
+
+
+        }
+        catch(Exception er)
+        {
+
+        }
+      
+
 
         host.Run();
 

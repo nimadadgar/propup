@@ -37,11 +37,14 @@ namespace Cmms.Core.Application.Services
             {
                 displayName = d.DisplayName,
                 userId = d.Id,
+                company=d.CompanyName,
+               identities=d.Identities
+                
             }).GetAsync());
             
 
             
-            return new UserClaimModel { displayName=result.DisplayName,userId=result.Id};
+            return new UserClaimModel {  displayName=result.DisplayName,userId=result.Id};
 
         }
     }

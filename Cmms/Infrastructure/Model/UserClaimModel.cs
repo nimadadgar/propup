@@ -10,6 +10,7 @@ namespace Cmms.Infrastructure.Model
     {
         public string userId { set; get; }
         public string displayName { set; get; }
+        public string email { set; get; }
     }
 
     public class AzureFunctionSettings

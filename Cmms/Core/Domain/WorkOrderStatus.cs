@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Cmms.Core.Domain
 {
-    public class WorkOrderType
+    public class WorkOrderStatus
     {
-
         [JsonProperty(PropertyName = "id")]
-        public Guid Id { set; get; }
+        public int Id { get; set; }
 
-        [JsonProperty(PropertyName = "workOrderTypeName")]
-        public string WorkOrderTypeName { set; get; }
+        [JsonProperty(PropertyName = "workorderStatus")]
+        public string WorkOrderStatusName { set; get; }
+
 
     }
 }

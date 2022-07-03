@@ -9,11 +9,12 @@ using System.Threading.Tasks;
 
 namespace Cmms.Core.Application
 {
-    public interface IUserService:IRepository<User>
+    public interface IUserService : IRepository<User>
     {
+        
         Task<User> GetUserById(Guid id);
         Task<User> GetUserByEmail(string email);
-        void Add(User user);
+        User Add(User user);
 
     }
     public class UserService : IUserService
@@ -32,20 +33,21 @@ namespace Cmms.Core.Application
 
 
         }
-        public void Add(User user)
+        public User Add(User user)
         {
-             _context.Users.Add(user);
+           return _context.Users.Add(user).Entity;
+
         }
 
 
-        public  Task<User> GetUserByEmail(string email)
+        public Task<User> GetUserByEmail(string email)
         {
             return _context.Users.FirstOrDefaultAsync(d => d.Email == email);
         }
 
         public Task<User> GetUserById(Guid id)
         {
-            return _context.Users.FirstOrDefaultAsync(d => d.Id == id);
+            return _context.Users.FirstOrDefaultAsync(d => d.UserId == id);
         }
     }
 }

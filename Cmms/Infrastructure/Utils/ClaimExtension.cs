@@ -8,6 +8,10 @@ using Cmms.Infrastructure.Model;
 
 namespace Cmms.Infrastructure.Utils
 {
+
+
+            
+    
         public static class ClaimsPrincipalExtensions
         {
             public static UserClaimModel UserInfo(this ClaimsPrincipal principal)
@@ -24,6 +28,24 @@ namespace Cmms.Infrastructure.Utils
 
             return model;
             }
+
+        public static bool IsClaimExist(this ClaimsPrincipal principal,String claimType,String claimValue)
+        {
+            if (principal == null)
+            {
+                return false;
+            }
+
+            string _existClaim = principal.FindFirst(claimType).Value;
+            if (_existClaim == claimValue)
+            {
+                return true;
+            }
+
+            return false;
+
+
         }
+    }
     
 }
