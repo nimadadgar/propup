@@ -25,6 +25,7 @@ namespace Cmms.Infrastructure.Utils
             
             model.userId = principal.FindFirst(ClaimTypes.NameIdentifier).Value;
             model.displayName = principal.FindFirst(ClaimTypes.GivenName).Value;
+            model.email = principal.FindFirst(ClaimTypes.Email).Value;
 
             return model;
             }

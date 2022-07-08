@@ -9,9 +9,7 @@ namespace Cmms.Core.Domain
 {
     public class TeamGroup
     {
-        public TeamGroup()
-        {
-        }
+       
         public Guid Id { get; set; }
         public string TeamGroupName { set; get; }
         public string Description { set; get; }

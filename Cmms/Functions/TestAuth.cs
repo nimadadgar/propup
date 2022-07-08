@@ -31,10 +31,7 @@ namespace Cmms
 
 
 
-        [OpenApiOperation(operationId: "testauth", tags: new[] { "testauth" }, Summary = "Greetings", Description = "This shows a welcome message.", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Summary = "The response", Description = "This returns the response")]
-        [Function("testauth")]
+            [Function("testauth")]
         public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "testauth")] HttpRequestData req,
        FunctionContext executionContext)
         {

@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace Cmms.Infrastructure.Dto
 {
-    public class AddTeamGroupDto
+    public class UpdateTeamGroupDto
     {
-        public Guid? id { set; get; }
+        [Required(ErrorMessage = "please enter id of team group ")]
+        public Guid id { set; get; }
 
         [Required(ErrorMessage = "please enter your team name")]
         public string teamName { set; get; }
         public string description { set; get; }
-
 
         public List<Guid> users { set; get; }
         

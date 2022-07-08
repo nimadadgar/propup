@@ -8,20 +8,16 @@ using System.Threading.Tasks;
 
 namespace Cmms.Infrastructure.Dto
 {
-    public class AddEquipmentDto
+    public record CreateEquipmentDto
     {
 
-        public Guid? id { set; get; }
-
         [Required(ErrorMessage ="please enter your equipmentName")]
-        public string equipmentName { set; get; }
-
+        public string equipmentName { get; init; }
 
         [Required(ErrorMessage = "please enter your description")]
-        public string description { set; get; }
+        public string description { init; get; }
 
-        public EquipmentStatusType status { set; get; }
-
+        public EquipmentStatusType status { init; get; }
  
     }
 }

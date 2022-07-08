@@ -105,20 +105,30 @@ public class Program
                 );
             ApplicationContext ctx = new ApplicationContext(opt.Options);
 
-           //var client= ctx.Database.GetCosmosClient();
-           //var container= client.GetContainer("propupcmmsdb", "teamGroup");
+            //var client = ctx.Database.GetCosmosClient();
+            //var container = client.GetContainer("propupcmmsdb", "equipment");
+            //await container.DeleteContainerAsync();
 
-           //await container.DeleteContainerAsync();
+            ctx.Database.EnsureDeleted();
+            ctx.Database.EnsureCreated();
+            await ctx.Users.AddAsync(new Cmms.Core.Domain.User
+            {
+                Company = "zoser",
+                Id = Guid.Parse("2f8f91e9-6298-4eae-9e0f-48a99500cd30"),
+                FullName = "javad zobeidi",
+                Email = "javad",
+                Role = "admin"
+
+            });
+            ctx.SaveChanges();
 
 
-            ////ctx.Database.EnsureDeleted();
-            ////ctx.Database.EnsureCreated();
 
             //ctx.Database.
 
 
         }
-        catch(Exception er)
+        catch (Exception er)
         {
 
         }

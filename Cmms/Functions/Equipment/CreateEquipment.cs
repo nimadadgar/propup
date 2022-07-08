@@ -23,36 +23,37 @@ namespace Cmms
 {
 
     [Authorize]
-    public class AddTeam
+    public class CreateEquipment
     {
         private readonly ILogger _logger;
         private readonly IClaimsPrincipalAccessor _claimsPrincipalAccessor;
-        private readonly ITeamService _teamService;
+        private readonly IEquipmentService _equipmentService;
 
-        public AddTeam(ILoggerFactory loggerFactory,
-            ITeamService teamService,
+        public CreateEquipment(ILoggerFactory loggerFactory,
+            IEquipmentService equipmentService,
             IClaimsPrincipalAccessor claimsPrincipalAccessor)
         {
             _claimsPrincipalAccessor = claimsPrincipalAccessor;
-            _logger = loggerFactory.CreateLogger<AddEquipment>();
-            _teamService = teamService;
+            _logger = loggerFactory.CreateLogger<CreateEquipment>();
+            _equipmentService = equipmentService;
         }
 
-       [Function("AddTeam")]
+        [Function("create")]
         [ClaimAttribute(ClaimTypes.Role, "admin")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post",Route = "addTeam")]
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post",Route = "equipment/create")]
         HttpRequestData req,
             FunctionContext executionContext)
         {
 
-           var requestObject=await req.GetBodyAsync<AddTeamGroupDto>();
+           var requestObject=await req.GetBodyAsync<CreateEquipmentDto>();
             if (!requestObject.IsValid)
             {
                 return req.BadResponse("Required some field please fill in", HttpStatusCode.BadRequest, requestObject.ValidationResults);
             }
 
-            var result = await  _teamService.AddTeam(requestObject.Value);
-            return req.OkResponse(new { result.Id });
+
+            var result = await  _equipmentService.Create(requestObject.Value);
+            return req.OkResponse(new { id=result.Id });
 
         }
     }

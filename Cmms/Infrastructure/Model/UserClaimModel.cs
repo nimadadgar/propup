@@ -9,6 +9,7 @@ namespace Cmms.Infrastructure.Model
     public class UserClaimModel
     {
         public string userId { set; get; }
+        public string userName { set; get; }
         public string displayName { set; get; }
         public string email { set; get; }
     }

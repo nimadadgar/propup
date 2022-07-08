@@ -63,9 +63,6 @@ namespace Cmms.Infrastructure.Middleware
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
 
-
-
-
             (Type featureType, object featureInstance) = context.Features.SingleOrDefault(x => x.Key.Name == "IFunctionBindingsFeature");
                 var inputData = featureType.GetProperties().SingleOrDefault(p => p.Name == "InputData")?.GetValue(featureInstance) as IReadOnlyDictionary<string, object>;
                 var requestData = inputData?.Values.SingleOrDefault(obj => obj is HttpRequestData) as HttpRequestData;
@@ -88,12 +85,14 @@ namespace Cmms.Infrastructure.Middleware
                 {
                     /////////////////Get Information Data
                     var user = await _graphService.GetUserById(data);
-                    currentUser= _userService.Add(new Core.Domain.User {Role="user", FullName = user.displayName, UserId = Guid.Parse(user.userId) });
+                    currentUser= _userService.Add(new Core.Domain.User {Role="user", FullName = user.displayName, Id = Guid.Parse(user.userId) });
                    await _userService.UnitOfWork.SaveChangesAsync();
                 }
                     List<Claim> claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier,currentUser.UserId.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier,currentUser.Id.ToString()),
+                    new Claim(ClaimTypes.Email,currentUser.Email.ToString()),
+
                     new Claim(ClaimTypes.GivenName,currentUser.FullName),
                     new Claim(ClaimTypes.Role,currentUser.Role),
                 };
@@ -105,7 +104,6 @@ namespace Cmms.Infrastructure.Middleware
                 else
             {
                 accessor.Principal = new ClaimsPrincipal(new ClaimsIdentity());
-
             }
 
 

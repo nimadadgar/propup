@@ -23,37 +23,37 @@ namespace Cmms
 {
 
     [Authorize]
-    public class AddEquipment
+    public class UpdateEquipment
     {
         private readonly ILogger _logger;
         private readonly IClaimsPrincipalAccessor _claimsPrincipalAccessor;
         private readonly IEquipmentService _equipmentService;
 
-        public AddEquipment(ILoggerFactory loggerFactory,
+        public UpdateEquipment(ILoggerFactory loggerFactory,
             IEquipmentService equipmentService,
             IClaimsPrincipalAccessor claimsPrincipalAccessor)
         {
             _claimsPrincipalAccessor = claimsPrincipalAccessor;
-            _logger = loggerFactory.CreateLogger<AddEquipment>();
+            _logger = loggerFactory.CreateLogger<CreateEquipment>();
             _equipmentService = equipmentService;
         }
 
-       [Function("addEquipment")]
+        [Function("update")]
         [ClaimAttribute(ClaimTypes.Role, "admin")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post",Route = "addEquipment")]
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post",Route = "equipment/update")]
         HttpRequestData req,
             FunctionContext executionContext)
         {
 
-           var requestObject=await req.GetBodyAsync<AddEquipmentDto>();
+           var requestObject=await req.GetBodyAsync<UpdateEquipmentDto>();
             if (!requestObject.IsValid)
             {
                 return req.BadResponse("Required some field please fill in", HttpStatusCode.BadRequest, requestObject.ValidationResults);
             }
 
 
-            var result = await  _equipmentService.Add(requestObject.Value);
-            return req.OkResponse(new { result.Id });
+            var result = await  _equipmentService.Update(requestObject.Value);
+            return req.OkResponse(new { id=result.Id });
 
         }
     }

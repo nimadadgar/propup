@@ -9,11 +9,14 @@ namespace Cmms.Core.Domain
 {
     public class User
     {
-        public Guid UserId { get; set; }
+        public Guid Id { get; set; }
         public string FullName { set; get; }
         public string Email { set; get; }
         public string Company { set; get; }
         public string Role { set; get; }
+
+     
+        /////////////////////
 
     }
 }

@@ -34,13 +34,13 @@ namespace Cmms
             IClaimsPrincipalAccessor claimsPrincipalAccessor)
         {
             _claimsPrincipalAccessor = claimsPrincipalAccessor;
-            _logger = loggerFactory.CreateLogger<AddEquipment>();
+            _logger = loggerFactory.CreateLogger<CreateEquipment>();
             _equipmentService = equipmentService;
         }
 
-       [Function("addSparePart")]
+       [Function("addsparepart")]
         [ClaimAttribute(ClaimTypes.Role, "admin")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post",Route = "addSparePart")]
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post",Route = "equipment/addsparepart")]
         HttpRequestData req,
             FunctionContext executionContext)
         {
@@ -53,7 +53,7 @@ namespace Cmms
 
 
             var result = await  _equipmentService.AddSparePart(requestObject.Value);
-            return req.OkResponse(new { result.Id });
+            return req.OkResponse(new {id= result.Id });
 
         }
     }

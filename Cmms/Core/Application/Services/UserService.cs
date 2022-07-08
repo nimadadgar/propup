@@ -47,7 +47,7 @@ namespace Cmms.Core.Application
 
         public Task<User> GetUserById(Guid id)
         {
-            return _context.Users.FirstOrDefaultAsync(d => d.UserId == id);
+            return _context.Users.FirstOrDefaultAsync(d => d.Id == id);
         }
     }
 }

@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace Cmms.Infrastructure.Dto
 {
-    public record AddSparePartDto
+    public record UpdateSparePartDto
     {
 
+        public Guid id { set; get; }
 
         [Required(ErrorMessage = "please enter your equipment id")]
         public Guid equipmentId { init; get; }
-
 
         [Required(ErrorMessage ="please enter your equipmentName")]
         public string partNumber { init; get; }

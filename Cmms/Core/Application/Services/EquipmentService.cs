@@ -13,8 +13,13 @@ namespace Cmms.Core.Application
 {
    public interface IEquipmentService : IRepository<Equipment>
   {
-   Task<Equipment> Add(AddEquipmentDto viewModel);
-   Task<SparePart> AddSparePart(AddSparePartDto viewModel);
+   Task<Equipment> Create(CreateEquipmentDto viewModel);
+   Task<Equipment> Update(UpdateEquipmentDto viewModel);
+   Task<UpdateEquipmentDto> GetById(Guid id);
+   Task<List<UpdateEquipmentDto>> Get();
+
+        Task<SparePart> AddSparePart(AddSparePartDto viewModel); 
+    Task<SparePart> UpdateSparePart(UpdateSparePartDto viewModel);
 
     }
     public class EquipmentService : IEquipmentService
@@ -32,26 +37,60 @@ namespace Cmms.Core.Application
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<Equipment> Add(AddEquipmentDto viewModel)
+        public async Task<Equipment> Create(CreateEquipmentDto viewModel)
         {
-            Equipment currentEq = null;
-            if (viewModel.id.HasValue==true)
-            {
-             currentEq = await _context.Equipments.FindAsync(viewModel.id.Value);
+            Equipment currentEq = new Equipment();
+            currentEq.Description = viewModel.description;
+            currentEq.EquipmentName = viewModel.equipmentName;
+            currentEq.CurrentStatus = viewModel.status;
+            _context.Equipments.Add(currentEq);
+            await _context.SaveChangesAsync();
+            return currentEq;
+        }
+
+        public async Task<Equipment> Update(UpdateEquipmentDto viewModel)
+        {
+            Equipment currentEq = await _context.Equipments.FindAsync(viewModel.id);
+            
                 if (currentEq == null)
                     throw new BadRequestException("parameters is not valid");
 
-            }
-            else
-            {
-                currentEq = new Equipment();
-                _context.Equipments.Add(currentEq);
-            }
+            currentEq.Description= viewModel.description; 
             currentEq.EquipmentName = viewModel.equipmentName;
             currentEq.CurrentStatus = viewModel.status;
-           await _context.SaveChangesAsync();
-            
+            await _context.SaveChangesAsync();
             return currentEq;
+        }
+
+        public async Task<UpdateEquipmentDto> GetById(Guid id)
+        {
+            Equipment currentEq = await _context.Equipments.FindAsync(id);
+            if (currentEq == null)
+                throw new BadRequestException("parameters is not valid");
+            return new UpdateEquipmentDto {id=id, description = currentEq.Description, equipmentName = currentEq.EquipmentName, status = currentEq.CurrentStatus };
+
+
+
+        }
+        public async Task<List<UpdateEquipmentDto>> Get()
+        {
+
+           var eq=await _context.Equipments.AsNoTracking().OrderBy(d=>d.EquipmentName).Skip(1).Take(2).ToListAsync();
+
+
+            var list = await _context.Equipments.AsNoTracking().OrderBy(d => d.EquipmentName)
+                .Skip(1).Take(2).Select(p => new UpdateEquipmentDto
+                {
+                    id = p.Id,
+                    description = p.Description,
+                    equipmentName = p.EquipmentName,
+                    status = p.CurrentStatus
+                }).ToListAsync();
+
+
+            return list;
+
+
         }
 
 
@@ -63,34 +102,41 @@ namespace Cmms.Core.Application
                 throw new BadRequestException("equipment not found");
 
 
-            SparePart part = null;
-            if (viewModel.id.HasValue == true)
-            {
-                part = currentEquipment.SpareParts.FirstOrDefault(d => d.Id == viewModel.id.Value);
-
-            }
-            else
-            {
-                part = new SparePart { Id = Guid.NewGuid() };
-                currentEquipment.AddSparePart(part);
-            }
-
-            if (part == null)
-                throw new BadRequestException("your spart part not found");
-
-
-
+            SparePart part = new SparePart { Id = Guid.NewGuid() };
             part.Description = viewModel.description;
             part.PartName = viewModel.partNumber;
-            part.Id = viewModel.id.HasValue ? viewModel.id.Value : Guid.NewGuid();
             part.UseCount = viewModel.useCount;
-
-
-           await _context.SaveChangesAsync();
+            currentEquipment.AddSparePart(part);
+            await _context.SaveChangesAsync();
             return part;
 
 
 
         }
+
+        public async Task<SparePart> UpdateSparePart(UpdateSparePartDto viewModel)
+        {
+
+           var eq= await _context.Equipments.Where(d => d.Id == viewModel.equipmentId).AsNoTracking().FirstOrDefaultAsync();
+       
+            if (eq==null)
+            {
+                throw new BadRequestException("Equipment Not Found");
+            }
+
+           var part= eq.SpareParts.Where(d => d.Id == viewModel.id).FirstOrDefault();
+            if (part==null)
+                throw new BadRequestException("Your SpartPart  Not Found");
+
+
+
+          part.Description = viewModel.description;
+            part.PartName = viewModel.partNumber;
+           part.UseCount = viewModel.useCount;
+           await _context.SaveChangesAsync();
+           return part;
+
+        }
+
     }
 }
