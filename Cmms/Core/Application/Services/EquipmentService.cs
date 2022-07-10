@@ -2,6 +2,7 @@
 using Cmms.Core.Domain;
 using Cmms.Infrastructure.Context;
 using Cmms.Infrastructure.Dto;
+using Cmms.Infrastructure.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,8 @@ namespace Cmms.Core.Application
   {
    Task<Equipment> Create(CreateEquipmentDto viewModel);
    Task<Equipment> Update(UpdateEquipmentDto viewModel);
-   Task<UpdateEquipmentDto> GetById(Guid id);
-   Task<List<UpdateEquipmentDto>> Get();
+   Task<EquipmentItemDto> GetById(Guid id);
+   Task<PaginatedList<EquipmentListItemDto>> GetAll(PaginationFilter pagination);
 
         Task<SparePart> AddSparePart(AddSparePartDto viewModel); 
     Task<SparePart> UpdateSparePart(UpdateSparePartDto viewModel);
@@ -62,35 +63,36 @@ namespace Cmms.Core.Application
             return currentEq;
         }
 
-        public async Task<UpdateEquipmentDto> GetById(Guid id)
+        public async Task<EquipmentItemDto> GetById(Guid id)
         {
-            Equipment currentEq = await _context.Equipments.FindAsync(id);
+            var currentEq = await _context.Equipments.Where(d => d.Id == id)
+                .Select(x=>EquipmentItemDto.ToItem(x))
+                .FirstOrDefaultAsync();
+
             if (currentEq == null)
                 throw new BadRequestException("parameters is not valid");
-            return new UpdateEquipmentDto {id=id, description = currentEq.Description, equipmentName = currentEq.EquipmentName, status = currentEq.CurrentStatus };
 
-
+            return currentEq;
 
         }
-        public async Task<List<UpdateEquipmentDto>> Get()
+        public async Task<PaginatedList<EquipmentListItemDto>> GetAll(PaginationFilter pagination)
         {
+            var query = _context.Equipments.AsNoTracking().AsQueryable();
 
-           var eq=await _context.Equipments.AsNoTracking().OrderBy(d=>d.EquipmentName).Skip(1).Take(2).ToListAsync();
-
-
-            var list = await _context.Equipments.AsNoTracking().OrderBy(d => d.EquipmentName)
-                .Skip(1).Take(2).Select(p => new UpdateEquipmentDto
+            foreach(var f in pagination.filters)
+            {
+                switch(f.name)
                 {
-                    id = p.Id,
-                    description = p.Description,
-                    equipmentName = p.EquipmentName,
-                    status = p.CurrentStatus
-                }).ToListAsync();
+                    case "equipmentName":
+                        query = query.Where(d => d.EquipmentName.Contains(f.value) == true);
+                        break;
+                }
+            }
 
-
-            return list;
-
-
+          var items= await PaginatedList<EquipmentListItemDto>.CreateAsync(
+              query.Select(x=>EquipmentListItemDto.ToItem(x))
+              , pagination.pageNumber, pagination.pageSize);
+            return items;
         }
 
 

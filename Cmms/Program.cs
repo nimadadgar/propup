@@ -109,18 +109,18 @@ public class Program
             //var container = client.GetContainer("propupcmmsdb", "equipment");
             //await container.DeleteContainerAsync();
 
-            ctx.Database.EnsureDeleted();
-            ctx.Database.EnsureCreated();
-            await ctx.Users.AddAsync(new Cmms.Core.Domain.User
-            {
-                Company = "zoser",
-                Id = Guid.Parse("2f8f91e9-6298-4eae-9e0f-48a99500cd30"),
-                FullName = "javad zobeidi",
-                Email = "javad",
-                Role = "admin"
+            //ctx.Database.EnsureDeleted();
+            //ctx.Database.EnsureCreated();
+            //await ctx.Users.AddAsync(new Cmms.Core.Domain.User
+            //{
+            //    Company = "zoser",
+            //    Id = Guid.Parse("2f8f91e9-6298-4eae-9e0f-48a99500cd30"),
+            //    FullName = "javad zobeidi",
+            //    Email = "javad",
+            //    Role = "admin"
 
-            });
-            ctx.SaveChanges();
+            //});
+            //ctx.SaveChanges();
 
 
 

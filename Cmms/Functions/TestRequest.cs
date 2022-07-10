@@ -37,7 +37,7 @@ namespace Cmms
         public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "testrequest")] HttpRequestData req,
        FunctionContext executionContext)
         {
-
+          
 
             string str= Newtonsoft.Json.JsonConvert.SerializeObject(req.Headers);
 

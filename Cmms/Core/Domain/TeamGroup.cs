@@ -7,17 +7,15 @@ using System.Threading.Tasks;
 
 namespace Cmms.Core.Domain
 {
-    public class TeamGroup
+    public class TeamGroup: EntityBase
     {
        
         public Guid Id { get; set; }
         public string TeamGroupName { set; get; }
         public string Description { set; get; }
 
-
         public IReadOnlyCollection<Guid> Members => _members;
         private List<Guid> _members = new List<Guid>();
-
 
         public void ClearMembers()
         {
@@ -28,9 +26,14 @@ namespace Cmms.Core.Domain
         {
                _members.AddRange(ids);  
         }
-        
+        public int GetMemberCount()
+        {
+            return _members.Count();
+        }
 
 
- 
+
+
+
     }
 }

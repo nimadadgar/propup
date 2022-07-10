@@ -23,29 +23,37 @@ namespace Cmms
 {
 
     [Authorize]
-    public class GetListEquipment
+    public class GetAllTeamGroup
     {
         private readonly ILogger _logger;
         private readonly IClaimsPrincipalAccessor _claimsPrincipalAccessor;
-        private readonly IEquipmentService _equipmentService;
+        private readonly ITeamService _team;
 
-        public GetListEquipment(ILoggerFactory loggerFactory,
-            IEquipmentService equipmentService,
+        public GetAllTeamGroup(ILoggerFactory loggerFactory,
+            ITeamService team,
             IClaimsPrincipalAccessor claimsPrincipalAccessor)
         {
             _claimsPrincipalAccessor = claimsPrincipalAccessor;
             _logger = loggerFactory.CreateLogger<CreateEquipment>();
-            _equipmentService = equipmentService;
+            _team = team;
         }
 
-        [Function("getlist")]
+        [Function("getallTeamGroup")]
         [ClaimAttribute(ClaimTypes.Role, "admin")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",Route = "equipment/getlist")]
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post",Route = "teamgroup/getall")]
         HttpRequestData req,
+           
             FunctionContext executionContext)
         {
-            var result = await  _equipmentService.Get();
-            return req.OkResponse(new {model= result });
+
+            var requestObject = await req.GetBodyAsync<PaginationFilter>();
+            if (!requestObject.IsValid)
+            {
+                return req.BadResponse("Required some field please fill in", HttpStatusCode.BadRequest, requestObject.ValidationResults);
+            }
+
+            var result = await  _team.GetAll(requestObject.Value);
+            return req.OkResponse(new {list= result });
 
         }
     }
