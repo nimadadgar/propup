@@ -39,9 +39,6 @@ namespace Cmms.Core
 
         public DbSet<User> Users { get; set; }
         public DbSet<TeamGroup>  TeamGroups{ get; set; }
-
-        //    public DbSet<WorkOrder> WorkOrders { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

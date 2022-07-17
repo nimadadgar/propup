@@ -16,7 +16,9 @@ namespace Cmms.Core.Application.Services
 {
     public interface IGraphService 
     {
-         Task<UserClaimModel> GetUserById(String id);
+         Task<UserClaimModel> GetUserById(string id);
+        Task<List<UserClaimModel>> GetUsersById(List<string> ids);
+        Task<List<UserClaimModel>> GetAllUsers();
 
     }
     public class GraphService : IGraphService
@@ -24,28 +26,45 @@ namespace Cmms.Core.Application.Services
         private readonly GraphServiceClient _client;
         public GraphService(String tenantId,String clientId,String clientSecret)
         {
-                     var scopes = new[] { "https://graph.microsoft.com/.default" };
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
             var clientSecretCredential = new ClientSecretCredential(tenantId,
-                    clientId, clientSecret);
+            clientId, clientSecret);
             _client = new GraphServiceClient(new TokenCredentialAuthProvider(clientSecretCredential, scopes));
         }
-   
 
-        public async Task<UserClaimModel> GetUserById(String id)
+
+        public async Task<List<UserClaimModel>> GetAllUsers()
         {
-            var result = (await _client.Users[id].Request().Select(d => new 
+            var result = await _client.Users.Request().GetAsync();
+            var data = result.AdditionalData;
+            return result.Select(u => UserClaimModel.ToUserClaim(u)).ToList();
+
+
+
+
+        }
+        public async Task<UserClaimModel> GetUserById(string id)
+        {
+            var result = await _client.Users[id].Request().GetAsync();
+            var data = result.AdditionalData;
+            return UserClaimModel.ToUserClaim(result);
+        }
+
+        public async Task<List<UserClaimModel>> GetUsersById(List<string> ids)
+        {
+           var query= string.Join(" or id eq", ids);
+
+            var listUsers = await (_client.Users.Request().Filter(query).Select(d => new
             {
                 displayName = d.DisplayName,
                 userId = d.Id,
-                company=d.CompanyName,
-               identities=d.Identities
-                
+                company = d.CompanyName,
+                identities = d.Identities
             }).GetAsync());
-            
 
-            
-            return new UserClaimModel {  displayName=result.DisplayName,userId=result.Id};
-
+            return listUsers.Select(d => UserClaimModel.ToUserClaim(d)).ToList();
         }
+
+
     }
 }

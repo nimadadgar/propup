@@ -21,11 +21,14 @@ namespace Cmms.Infrastructure.Utils
                 throw new Exception("user is not authorizing");
             }
 
-            UserClaimModel model = new UserClaimModel();
-            
-            model.userId = principal.FindFirst(ClaimTypes.NameIdentifier).Value;
-            model.displayName = principal.FindFirst(ClaimTypes.GivenName).Value;
-            model.email = principal.FindFirst(ClaimTypes.Email).Value;
+
+            UserClaimModel model = new UserClaimModel(
+                 principal.FindFirst(ClaimTypes.NameIdentifier).Value,
+                 principal.FindFirst(ClaimTypes.Email).Value,
+                 principal.FindFirst(ClaimTypes.GivenName).Value
+
+                );
+
 
             return model;
             }

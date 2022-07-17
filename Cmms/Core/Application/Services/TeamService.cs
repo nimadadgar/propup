@@ -1,4 +1,5 @@
 ﻿using Cmms.Core.Application.Exceptions;
+using Cmms.Core.Application.Services;
 using Cmms.Core.Domain;
 using Cmms.Infrastructure.Context;
 using Cmms.Infrastructure.Dto;
@@ -24,6 +25,8 @@ namespace Cmms.Core.Application
     public class TeamService : ITeamService
     {
         private readonly ApplicationContext _context;
+        private readonly IGraphService _graphService;
+
         public IUnitOfWork UnitOfWork
         {
             get
@@ -31,9 +34,11 @@ namespace Cmms.Core.Application
                 return _context;
             }
         }
-        public TeamService(ApplicationContext context)
+        public TeamService(ApplicationContext context,IGraphService graphService)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _graphService = graphService ?? throw new ArgumentNullException(nameof(graphService));
+
         }
         public async Task<TeamGroup> AddTeam(AddTeamGroupDto viewModel)
         {
@@ -86,8 +91,10 @@ namespace Cmms.Core.Application
             var item =await _context.TeamGroups.AsNoTracking().Where(d => d.Id == id).Select(x=>TeamGroupItemDto.ToItem(x)).FirstOrDefaultAsync();
             if (item == null)
                 throw new BadRequestException("your teamgroup not found");
+            
+            var userIds= item.members.Select(d => d.id).ToList();
 
-           var userIds= item.members.Select(d => d.id).ToList();
+
         var users=   await _context.Users.Where(x => userIds.Contains(x.Id)).ToListAsync();
             item.members= (from u in users
              join m in item.members on u.Id equals m.id

@@ -68,46 +68,31 @@ namespace Cmms.Infrastructure.Middleware
                 var requestData = inputData?.Values.SingleOrDefault(obj => obj is HttpRequestData) as HttpRequestData;
             var accessor = context.InstanceServices.GetRequiredService<IClaimsPrincipalAccessor>();
 
-            if (requestData.Headers.TryGetValues("x-ms-client-principal-id", out var header))
-                {
+          var isHeaderExist=  requestData.Headers.TryGetValues("x-ms-client-principal-id", out var header);
+            if (!isHeaderExist)
+                throw new BadRequestException("parameters is wrong");
 
-                var data = header.First();
-                Guid userId;
-                
-               var isConvert= Guid.TryParse(data, out userId);
-                if (isConvert == false)
-                {
-                    throw new BadRequestException("parameters is wrong");
-                }
 
-             var currentUser=  await _userService.GetUserById(userId);
-                if (currentUser==null)
-                {
-                    /////////////////Get Information Data
+
+            var users = await _graphService.GetAllUsers();
+
+
+            var data = header.First();
                     var user = await _graphService.GetUserById(data);
-                    currentUser= _userService.Add(new Core.Domain.User {Role="user", FullName = user.displayName, Id = Guid.Parse(user.userId) });
-                   await _userService.UnitOfWork.SaveChangesAsync();
-                }
+            if (user is null)
+                throw new BadRequestException("parameters is wrong");
+
+                
                     List<Claim> claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier,currentUser.Id.ToString()),
-                    new Claim(ClaimTypes.Email,currentUser.Email.ToString()),
-
-                    new Claim(ClaimTypes.GivenName,currentUser.FullName),
-                    new Claim(ClaimTypes.Role,currentUser.Role),
+                    new Claim(ClaimTypes.NameIdentifier,user.userId.FixNull()),
+                    new Claim(ClaimTypes.Email,user.email.FixNull()),
+                    new Claim(ClaimTypes.GivenName,user.displayName.FixNull()),
+                    new Claim(ClaimTypes.Role,String.IsNullOrWhiteSpace(user.role)==true?"admin":user.role),
                 };
+
                 ClaimsIdentity clientIdentity = new ClaimsIdentity(claims,"Basic");
-              
                 accessor.Principal = new ClaimsPrincipal(clientIdentity);
-
-                }
-                else
-            {
-                accessor.Principal = new ClaimsPrincipal(new ClaimsIdentity());
-            }
-
-
-
             await next(context);
 
         }

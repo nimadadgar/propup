@@ -8,10 +8,25 @@ namespace Cmms.Infrastructure.Model
 {
     public class UserClaimModel
     {
-        public string userId { set; get; }
-        public string userName { set; get; }
-        public string displayName { set; get; }
-        public string email { set; get; }
+        public UserClaimModel(string userId,string userName,string company)
+        {
+            this.userId = userId;
+            this.userName = userName;   
+            this.company = company;
+        }
+        public string userId { init; get; }
+        public string userName { init; get; }
+        public string company { init; get; }
+        public string displayName { init; get; }
+        public string email { init; get; }
+        public string role { init; get; }
+
+        
+        public static UserClaimModel ToUserClaim(Microsoft.Graph.User user)
+        {
+            return new UserClaimModel(user.Id, user.Mail, user.CompanyName);
+
+        }
     }
 
     public class AzureFunctionSettings

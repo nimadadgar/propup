@@ -9,16 +9,12 @@ namespace Cmms.Core.Application.Models
   
     public class ResponseViewModel
     {
-
-
         public object data { set; get; }
-
         public ResponseViewModel(object data)
         {
             this.data = data;
 
         }
-
     }
     public class BadResponseViewModel
     {

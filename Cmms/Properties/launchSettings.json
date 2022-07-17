@@ -2,7 +2,7 @@
   "profiles": {
     "Cmms": {
       "commandName": "Project",
-      "commandLineArgs": "--port 5001"
+      "commandLineArgs": "--port 7065"
     }
   }
 }
