@@ -8,14 +8,13 @@ namespace Cmms.Infrastructure.Model
 {
     public class UserClaimModel
     {
-        public UserClaimModel(string userId,string userName,string company)
+        public UserClaimModel(string userId,string email,string displayName,string company)
         {
             this.userId = userId;
-            this.userName = userName;   
+            this.email = email;   
             this.company = company;
         }
         public string userId { init; get; }
-        public string userName { init; get; }
         public string company { init; get; }
         public string displayName { init; get; }
         public string email { init; get; }
@@ -24,7 +23,7 @@ namespace Cmms.Infrastructure.Model
         
         public static UserClaimModel ToUserClaim(Microsoft.Graph.User user)
         {
-            return new UserClaimModel(user.Id, user.Mail, user.CompanyName);
+            return new UserClaimModel(user.Id, user.Mail,user.DisplayName, user.CompanyName);
 
         }
     }

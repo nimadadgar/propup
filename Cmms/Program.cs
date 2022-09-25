@@ -14,6 +14,7 @@ using System.Reflection;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;
 using Cmms.Core.Application;
 using Microsoft.Azure.Functions.Worker.Configuration;
+using Cmms.Core.Domain;
 
 public class Program
 {
@@ -26,22 +27,31 @@ public class Program
         var host = new HostBuilder()
           .ConfigureAppConfiguration((hostContext, config) =>
           {
-          }).ConfigureOpenApi()
-                          
 
+          })
              .ConfigureFunctionsWorkerDefaults(workerApplication =>
              {
-
                  // Register our custom middlewares with the worker
                  workerApplication.UseMiddleware<ExceptionHandlingMiddleware>();
                  workerApplication.UseMiddleware<AuthenticateMiddleware>();
                  workerApplication.UseMiddleware<AuthorizeMiddleware>();
+                 
+               
 
 
              })
             .ConfigureServices((context, services) =>
             {
-              
+
+
+            
+
+                services.AddControllers()
+              .AddJsonOptions(options =>
+          {
+           options.JsonSerializerOptions.PropertyNameCaseInsensitive = false;
+           });
+
 
                 services.AddLogging();
 
@@ -54,34 +64,15 @@ public class Program
                     new GraphService(
                     Environment.GetEnvironmentVariable("Graph_TanentId"),
                     Environment.GetEnvironmentVariable("Graph_ClientId"),
-                    Environment.GetEnvironmentVariable("Graph_SecreteKey")
+                    Environment.GetEnvironmentVariable("Graph_SecreteKey"),
+                    Environment.GetEnvironmentVariable("Graph_B2cExtensionAppClientId")
                     )
                         );
-
-
-                // logger.LogError(Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY"));
-
+                services.AddScoped<GeneralService>();
 
                 services.AddScoped<IEquipmentService, EquipmentService>();
-                services.AddScoped<IUserService, UserService>();
                 services.AddScoped<ITeamService, TeamService>();
-
-
-                //services.AddApplicationInsightsTelemetry(opts =>
-                //{
-                //    opts.DependencyCollectionOptions.EnableLegacyCorrelationHeadersInjection = true;
-                //    //opts.InstrumentationKey = key;
-
-                //});
-
-
-                //       services.AddApplicationInsightsTelemetry(key);
-
-
-                //var configuration = context.Configuration;
-                //AzureFunctionSettings model = new AzureFunctionSettings();
-
-
+                services.AddScoped<IUserService, UserService>();
 
                 services.AddDbContext<ApplicationContext>(opt =>
                 {
@@ -94,45 +85,29 @@ public class Program
             })
             .Build();
 
+
         try
         {
             var opt = new DbContextOptionsBuilder<ApplicationContext>();
-
             opt.UseCosmos(
                    Environment.GetEnvironmentVariable("COSMOS_ENDPOINT"),
                    Environment.GetEnvironmentVariable("COSMOS_EACCOUNTKEY"),
                    databaseName: "propupcmmsdb"
                 );
-            ApplicationContext ctx = new ApplicationContext(opt.Options);
 
-            //var client = ctx.Database.GetCosmosClient();
-            //var container = client.GetContainer("propupcmmsdb", "equipment");
-            //await container.DeleteContainerAsync();
 
-            //ctx.Database.EnsureDeleted();
-            //ctx.Database.EnsureCreated();
-            //await ctx.Users.AddAsync(new Cmms.Core.Domain.User
-            //{
-            //    Company = "zoser",
-            //    Id = Guid.Parse("2f8f91e9-6298-4eae-9e0f-48a99500cd30"),
-            //    FullName = "javad zobeidi",
-            //    Email = "javad",
-            //    Role = "admin"
-
-            //});
+            //ApplicationContext ctx = new ApplicationContext(opt.Options);
+          //  Cmms.InitialDb.InitialMetal(ctx);
             //ctx.SaveChanges();
-
-
-
-            //ctx.Database.
-
 
         }
         catch (Exception er)
         {
 
         }
-      
+
+
+
 
 
         host.Run();

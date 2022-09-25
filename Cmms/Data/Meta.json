@@ -1,0 +1,59 @@
+﻿{
+  "AccessLevels": [
+    {
+      "AccessLevelName": "Admin Manager",
+      "Roles": [
+        "admin"
+      ]
+    },
+    {
+      "AccessLevelName": "Inventory Manager",
+      "Roles": [
+        "inventory"
+      ]
+    },
+    {
+      "AccessLevelName": "Member Manager",
+      "Roles": [
+        "member"
+      ]
+    },
+    {
+      "AccessLevelName": "Senior Manager",
+      "Roles": [
+        "senior"
+      ]
+    }
+
+
+
+  ],
+
+  "Factories": [
+    {
+      "FactoryName": "Admin Manager",
+      "City": "Perth"
+    },
+    {
+      "FactoryName": "BHP",
+      "City": "Melbourne"
+    },
+    {
+      "FactoryName": "Woolworths",
+      "City": "BellaVista"
+    }
+  ],
+
+  "Jobs": [
+    {
+      "JobTitle": "Manager"
+    },
+    {
+      "JobTitle": "Technician"
+    },
+    {
+      "JobTitle": "StoreKeeper"
+    }
+  ]
+
+}

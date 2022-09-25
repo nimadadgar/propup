@@ -24,10 +24,7 @@ public class EquipmentEntityConfiguration : IEntityTypeConfiguration<Equipment>
         builder.OwnsMany(t => t.SpareParts, sa =>
         {
             sa.ToJsonProperty("spareParts");
-
             sa.HasKey(p => p.Id);
-
-
             sa.Property(d => d.PartName).ToJsonProperty("partName");
             sa.Property(d => d.Description).ToJsonProperty("description");
             sa.Property(d => d.PartName).ToJsonProperty("partName");

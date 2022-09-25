@@ -11,50 +11,50 @@ using Cmms.Infrastructure.Utils;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Cmms.Infrastructure.Middleware;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.OpenApi.Models;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
+using Cmms.Functions;
 using Cmms.Infrastructure.Dto;
 using Cmms.Core.Application;
-using System.ComponentModel.DataAnnotations;
-using Cmms.Functions;
 
 namespace Cmms
 {
 
-    [Authorize]
-    public class AddSparePart
+    public class AcceptInviteUser
     {
         private readonly ILogger _logger;
         private readonly IClaimsPrincipalAccessor _claimsPrincipalAccessor;
-        private readonly IEquipmentService _equipmentService;
+        private readonly IUserService _userService;
 
-        public AddSparePart(ILoggerFactory loggerFactory,
-            IEquipmentService equipmentService,
+        public AcceptInviteUser(ILoggerFactory loggerFactory,
+            IUserService userService,
             IClaimsPrincipalAccessor claimsPrincipalAccessor)
         {
             _claimsPrincipalAccessor = claimsPrincipalAccessor;
-            _logger = loggerFactory.CreateLogger<CreateEquipment>();
-            _equipmentService = equipmentService;
+            _logger = loggerFactory.CreateLogger<InviteUser>();
+            _userService = userService;
+
         }
 
-       [Function("addsparepart")]
-        [ClaimAttribute(ClaimTypes.Role, "addsparepart")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post",Route = "equipment/addsparepart")]
-        HttpRequestData req,
-            FunctionContext executionContext)
+
+
+
+        [Function("AcceptInvite")]
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post",Route = "user/acceptinvite")] HttpRequestData req,
+       FunctionContext executionContext)
         {
 
-           var requestObject=await req.GetBodyAsync<AddSparePartDto>();
+            var requestObject = await req.GetBodyAsync<AcceptInviteUserDto>();
             if (!requestObject.IsValid)
             {
                 return req.BadResponse("Required some field please fill in", HttpStatusCode.BadRequest, requestObject.ValidationResults);
             }
 
+            var result = await _userService.AcceptInvitedUser( requestObject.Value.Id,requestObject.Value.Password);
+            return req.OkResponse(new {  });
 
-            var result = await  _equipmentService.AddSparePart(requestObject.Value);
-            return req.OkResponse(new {id= result.Id });
-
+        
         }
     }
 }

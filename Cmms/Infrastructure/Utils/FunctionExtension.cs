@@ -1,6 +1,9 @@
-﻿using Cmms.Core.Application.Models;
+﻿using Azure.Core.Serialization;
+using Cmms.Core.Application.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,11 +54,24 @@ namespace Cmms.Infrastructure.Utils
 
         }
 
+    
+
+
         public static HttpResponseData OkResponse(this HttpRequestData req, object data)
         {
+
+            var s = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+
+            var serializer = new NewtonsoftJsonObjectSerializer(s);
+
             ResponseViewModel responseModel = new ResponseViewModel(data);
             var response = req.CreateResponse(HttpStatusCode.OK);
-            response.WriteAsJsonAsync(responseModel);
+          
+            response.WriteAsJsonAsync(responseModel, serializer);
             return response;
         }
     }

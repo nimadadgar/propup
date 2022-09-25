@@ -31,31 +31,31 @@ namespace Cmms.Infrastructure.Middleware
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
 
-            string functionEntryPoint = context.FunctionDefinition.EntryPoint;
-            Type assemblyType = Type.GetType(functionEntryPoint.Substring(0, functionEntryPoint.LastIndexOf('.')));
-            if (assemblyType == null)
-            {
-                ///Process if other function called
-            }
-            else
-            {
-                MethodInfo methodInfo = assemblyType.GetMethod(functionEntryPoint.Substring(functionEntryPoint.LastIndexOf('.') + 1));
-                var attr = methodInfo?.GetCustomAttributes(typeof(ClaimAttribute), true).FirstOrDefault() as ClaimAttribute;
-                if (attr != null)
-                {
-                    ////////////////Check is Authinticate and Role Base
-                    if (_claimsPrincipalAccessor.Principal.Identity.IsAuthenticated == false)
-                        throw new AuthorizeException("User has not been authenticated");
+            //string functionEntryPoint = context.FunctionDefinition.EntryPoint;
+            //Type assemblyType = Type.GetType(functionEntryPoint.Substring(0, functionEntryPoint.LastIndexOf('.')));
+            //if (assemblyType == null)
+            //{
+            //    ///Process if other function called
+            //}
+            //else
+            //{
+            //    MethodInfo methodInfo = assemblyType.GetMethod(functionEntryPoint.Substring(functionEntryPoint.LastIndexOf('.') + 1));
+            //    var attr = methodInfo?.GetCustomAttributes(typeof(ClaimAttribute), true).FirstOrDefault() as ClaimAttribute;
+            //    if (attr != null)
+            //    {
+            //        ////////////////Check is Authinticate and Role Base
+            //        if (_claimsPrincipalAccessor.Principal.Identity.IsAuthenticated == false)
+            //            throw new AuthorizeException("User has not been authenticated");
 
-                    if (attr._claimType != String.Empty)
-                    {
-                        //////Check Claim
-                        if (!_claimsPrincipalAccessor.Principal.IsClaimExist(attr._claimType, attr._claim))
-                            throw new AuthorizeException("User Not Authorize");
-                    }
+            //        if (attr._claimType != String.Empty)
+            //        {
+            //            //////Check Claim
+            //            if (!_claimsPrincipalAccessor.Principal.IsClaimExist(attr._claimType, attr._claim))
+            //                throw new AuthorizeException("User Not Authorize");
+            //        }
 
-                }
-            }
+            //    }
+            //}
 
 
             await next(context);

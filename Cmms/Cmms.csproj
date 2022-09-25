@@ -32,6 +32,10 @@
   </ItemGroup>
   <ItemGroup>
   
+	  <None Update="Data\Meta.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+  
 	  <None Update="host.json">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>

@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Cmms.Infrastructure.Utils;
+using System.Net;
+
 namespace Cmms.Core
 {
 
@@ -33,12 +35,50 @@ namespace Cmms.Core
             this.ChangeTracker.LazyLoadingEnabled = false;
         }
 
+        private const string Meta = nameof(Meta);
+        public const string PartitionKey = nameof(PartitionKey);
+
+
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<SparePart> SpareParts { get; set; }
         public DbSet<Audit> AuditLogs { get; set; }
+        public DbSet<InvitedUser> InvitedUsers  { get; set; }
+        public DbSet<AccessLevel> AccessLevels { get; set; }
+        public DbSet<Job> Jobs { get; set; }
+        public DbSet<Factory> Factories { get; set; }
 
         public DbSet<User> Users { get; set; }
         public DbSet<TeamGroup>  TeamGroups{ get; set; }
+
+        public  string ComputePartitionKey<T>()
+        where T : class => typeof(T).Name;
+
+
+        public void SetPartitionKey<T>(T entity)
+           where T : class =>
+               Entry(entity).Property(PartitionKey).CurrentValue =
+                   ComputePartitionKey<T>();
+
+        public async ValueTask<T> FindMetaAsync<T>(string key)
+         where T : class
+        {
+            var partitionKey = ComputePartitionKey<T>();
+            try
+            {
+                return await FindAsync<T>(key, partitionKey);
+            }
+            catch (Microsoft.Azure.Cosmos.CosmosException ce)
+            {
+                if (ce.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
+                throw;
+            }
+        }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -46,13 +86,46 @@ namespace Cmms.Core
             modelBuilder.ApplyConfiguration<TeamGroup>(new TeamGroupEntityConfiguration());
             modelBuilder.ApplyConfiguration<User>(new UserEntityConfiguration());
             modelBuilder.ApplyConfiguration<Audit>(new AuditLogEntityConfiguration());
-
+            modelBuilder.ApplyConfiguration<InvitedUser>(new InvitedUserConfiguration());
             modelBuilder.Entity<WorkOrder>(m =>
             {
                 m.ToContainer("workOrder");
+                m.HasNoDiscriminator();
                 m.HasPartitionKey(d => d.EquipmentId);
                 m.HasKey(d => d.WorkOrderNumber);
             });
+
+
+            string PartitionKey = nameof(PartitionKey);
+
+            var jobModel = modelBuilder.Entity<Job>();
+            jobModel.Property<string>(PartitionKey);
+            jobModel.HasPartitionKey(PartitionKey);
+            jobModel.ToContainer("Meta")
+                .HasKey(nameof(Job.JobTitle), PartitionKey);
+            jobModel.Property(t => t.ETag)
+                .IsETagConcurrency();
+
+
+            var access = modelBuilder.Entity<AccessLevel>();
+            access.Property<string>(PartitionKey);
+            access.HasPartitionKey(PartitionKey);
+            access.ToContainer(Meta)
+                .HasKey(nameof(AccessLevel.AccessLevelName), PartitionKey);
+            access.Property(t => t.ETag)
+                .IsETagConcurrency();
+
+
+            var factory = modelBuilder.Entity<Factory>();
+            factory.Property<string>(PartitionKey);
+            factory.HasPartitionKey(PartitionKey);
+            factory.ToContainer("Meta")
+                .HasKey(nameof(Factory.FactoryName), PartitionKey);
+            factory.Property(t => t.ETag)
+                .IsETagConcurrency();
+
+
+
         }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
@@ -69,7 +142,8 @@ namespace Cmms.Core
 
         private List<AuditEntry> OnBeforeSaveChanges()
         {
-          var  _username = _claimsPrincipalAccessor.Principal.UserInfo().email;
+
+            var _username = "unknow";// _claimsPrincipalAccessor.Principal.Email();
 
             ChangeTracker.DetectChanges();
             DateTime dt = DateTime.Now;

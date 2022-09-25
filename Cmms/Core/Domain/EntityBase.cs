@@ -11,9 +11,9 @@ namespace Cmms.Core.Domain
 {
     public abstract class EntityBase : IAuditable
     {
-        public virtual DateTime CreatedDate { get; set; }
+        public virtual DateTimeOffset CreatedDate { get; set; }
         public virtual string CreatedBy { get; set; }
-        public virtual DateTime UpdatedDate { get; set; }
+        public virtual DateTimeOffset UpdatedDate { get; set; }
         public virtual string UpdatedBy { get; set; }
     }
 

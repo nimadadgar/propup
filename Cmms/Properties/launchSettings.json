@@ -2,7 +2,9 @@
   "profiles": {
     "Cmms": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7065"
+      "commandLineArgs": "--port 7065",
+      "remoteDebugEnabled": true,
+      "remoteDebugMachine": "0.0.0.0:7065"
     }
   }
 }

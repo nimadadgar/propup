@@ -15,34 +15,46 @@ using Microsoft.OpenApi.Models;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Cmms.Functions;
+using Cmms.Infrastructure.Dto;
+using Cmms.Core.Application;
 
 namespace Cmms
 {
 
-    public class TestRequest
+    public class GetInviteUserInfo
     {
         private readonly ILogger _logger;
         private readonly IClaimsPrincipalAccessor _claimsPrincipalAccessor;
+        private readonly IUserService _userService;
 
-        public TestRequest(ILoggerFactory loggerFactory, IClaimsPrincipalAccessor claimsPrincipalAccessor)
+        public GetInviteUserInfo(ILoggerFactory loggerFactory,
+            IUserService userService,
+            IClaimsPrincipalAccessor claimsPrincipalAccessor)
         {
+            _logger = loggerFactory.CreateLogger<GetInviteUserInfo>();
             _claimsPrincipalAccessor = claimsPrincipalAccessor;
-            _logger = loggerFactory.CreateLogger<GetUserInfo>();
+            _userService = userService;
         }
 
 
-    
-        [Function("TestRequest")]
-        public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "testrequest")] HttpRequestData req,
+
+
+        [Function("inviteinfo")]
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get",Route = "user/inviteinfo/{id}")] 
+        HttpRequestData req,
+            Guid id,
        FunctionContext executionContext)
         {
-            string str= Newtonsoft.Json.JsonConvert.SerializeObject(req.Headers);
-            return req.OkResponse(new {Result= str });
+
+            var result = await _userService.ProcessGetInviteUser( id);
+            if (result == null)
+                return req.BadResponse("Invited Link Expired");
 
 
 
+            return req.OkResponse("OK");
 
-
+        
         }
     }
 }

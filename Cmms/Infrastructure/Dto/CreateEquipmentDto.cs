@@ -13,10 +13,8 @@ namespace Cmms.Infrastructure.Dto
 
         [Required(ErrorMessage ="please enter your equipmentName")]
         public string equipmentName { get; init; }
-
         [Required(ErrorMessage = "please enter your description")]
         public string description { init; get; }
-
         public EquipmentStatusType status { init; get; }
  
     }

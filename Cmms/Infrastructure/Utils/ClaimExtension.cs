@@ -8,30 +8,39 @@ using Cmms.Infrastructure.Model;
 
 namespace Cmms.Infrastructure.Utils
 {
-
-
-            
     
         public static class ClaimsPrincipalExtensions
         {
-            public static UserClaimModel UserInfo(this ClaimsPrincipal principal)
-            {
-                if (principal == null)
-            {
-                throw new Exception("user is not authorizing");
-            }
+           
+        public static Guid UserId(this ClaimsPrincipal principal)
+        {
+           return  Guid.Parse(GetClaim(principal, ClaimTypes.NameIdentifier));
+        }
+
+        public static string Email(this ClaimsPrincipal principal)
+        {
+            return GetClaim(principal, "email");
+        }
+        public static string Name(this ClaimsPrincipal principal)
+        {
+            return GetClaim(principal, "name");
+        }
+        public static string  Company(this ClaimsPrincipal principal)
+        {
+            return GetClaim(principal, "extension_Department");
+        }
+
+        public static string GetClaim(this ClaimsPrincipal principal,String claimType)
+        {
+            if (principal.FindFirst(claimType) != null)
+                return principal.FindFirst(claimType).Value;
 
 
-            UserClaimModel model = new UserClaimModel(
-                 principal.FindFirst(ClaimTypes.NameIdentifier).Value,
-                 principal.FindFirst(ClaimTypes.Email).Value,
-                 principal.FindFirst(ClaimTypes.GivenName).Value
 
-                );
+            return String.Empty;
 
 
-            return model;
-            }
+        }
 
         public static bool IsClaimExist(this ClaimsPrincipal principal,String claimType,String claimValue)
         {

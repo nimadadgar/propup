@@ -37,15 +37,21 @@ namespace Cmms
         //[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Summary = "The response", Description = "This returns the response")]
        
         [Function("getuserinfo")]
-        [ClaimAttribute(ClaimTypes.Role, "admin")]
-        [ClaimAttribute(ClaimTypes.Role, "user")]
+      
         public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",Route = "getuserinfo")] HttpRequestData req,
        FunctionContext executionContext)
         {
 
            _logger.LogInformation( Newtonsoft.Json.JsonConvert.SerializeObject( req.Headers));
-            var currentUser = _claimsPrincipalAccessor.Principal.UserInfo();
-            return req.OkResponse(new { displayName = currentUser.displayName, id = currentUser.userId });
+            var currentUser = new
+            {
+
+                company = _claimsPrincipalAccessor.Principal.Company(),
+                displayName = _claimsPrincipalAccessor.Principal.Name(),
+                userId = _claimsPrincipalAccessor.Principal.UserId()
+            };
+
+            return req.OkResponse(new { model = currentUser });
 
 
 

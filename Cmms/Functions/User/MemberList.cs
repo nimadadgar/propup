@@ -15,34 +15,41 @@ using Microsoft.OpenApi.Models;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Cmms.Functions;
+using Cmms.Infrastructure.Dto;
+using Cmms.Core.Application;
 
 namespace Cmms
 {
 
-    public class TestRequest
+    public class MemberList
     {
         private readonly ILogger _logger;
         private readonly IClaimsPrincipalAccessor _claimsPrincipalAccessor;
+        private readonly IUserService _userService;
 
-        public TestRequest(ILoggerFactory loggerFactory, IClaimsPrincipalAccessor claimsPrincipalAccessor)
+        public MemberList(ILoggerFactory loggerFactory,
+            IUserService userService,
+            IClaimsPrincipalAccessor claimsPrincipalAccessor)
         {
             _claimsPrincipalAccessor = claimsPrincipalAccessor;
-            _logger = loggerFactory.CreateLogger<GetUserInfo>();
+            _logger = loggerFactory.CreateLogger<InviteUser>();
+            _userService = userService;
+
         }
 
 
-    
-        [Function("TestRequest")]
-        public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "testrequest")] HttpRequestData req,
+
+
+        [Function("MemberList")]
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post",Route = "user/list")] HttpRequestData req,
        FunctionContext executionContext)
         {
-            string str= Newtonsoft.Json.JsonConvert.SerializeObject(req.Headers);
-            return req.OkResponse(new {Result= str });
 
 
+            var result = await _userService.UserList();
+            return req.OkResponse(new { list = result });
 
-
-
+        
         }
     }
 }
