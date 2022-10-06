@@ -60,6 +60,12 @@ public class Program
                 String key = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY");
 
                 services.AddApplicationInsightsTelemetryWorkerService(key);
+
+                services.AddScoped<MailSender, MailSender>(sp =>
+                    new MailSender(Environment.GetEnvironmentVariable("SendMail_ApiKey") )
+                        );
+
+
                 services.AddScoped<IGraphService, GraphService>(sp =>
                     new GraphService(
                     Environment.GetEnvironmentVariable("Graph_TanentId"),

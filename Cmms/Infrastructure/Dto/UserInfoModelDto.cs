@@ -1,4 +1,5 @@
 ﻿using Cmms.Core.Application.Services;
+using Cmms.Core.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Cmms.Infrastructure.Dto
     public class UserInfoModelDto
     {
         public UserInfoModelDto(string UserId,string Email,string DisplayName, string FirstName,string SurName,
-            string Location,string JobTitle,string AccessLevels,string Status,string MobilePhone)
+           string JobTitle, string Location,string AccessLevels,string Status,string MobilePhone)
         {
             this.UserId = UserId;
             this.FirstName = FirstName;
@@ -63,18 +64,22 @@ namespace Cmms.Infrastructure.Dto
         public static UserInfoModelDto ToUserClaim(Microsoft.Graph.User user,GraphService graph)
         {
             var identity = user.Identities.Where(d => d.SignInType == "emailAddress").Select(d => d.IssuerAssignedId).FirstOrDefault();
+            return new UserInfoModelDto(user.Id, identity
+                ,user.DisplayName, user.GivenName
+                ,user.Surname
+                ,user.JobTitle
+                ,GetKey(user.AdditionalData, graph.LocationAttribute)
+                ,GetKey(user.AdditionalData, graph.AccessLevelsAttribute)
+                ,GetKey(user.AdditionalData, graph.StatusAttribute),user.MobilePhone);
+        }
 
-            
-
-
-            return new UserInfoModelDto(user.Id, identity,user.DisplayName, user.GivenName, user.Surname,
-               GetKey(user.AdditionalData, graph.LocationAttribute),
-               GetKey(user.AdditionalData, graph.JobAttribute),
-               GetKey(user.AdditionalData, graph.AccessLevelsAttribute),
-               GetKey(user.AdditionalData, graph.StatusAttribute),user.MobilePhone);
-                              
+        public static UserInfoModelDto ToUserInfo(InvitedUser user)
+        {
+            return new UserInfoModelDto(user.Id.ToString(), user.Email, user.FirstName + " " + user.SurName, user.FirstName,
+                user.SurName, user.JobTitle, user.LocationName,"", "Pending", user.MobileNumber);
 
         }
+
     }
 
    

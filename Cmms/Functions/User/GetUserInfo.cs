@@ -31,13 +31,7 @@ namespace Cmms
         }
 
 
-
-        //[OpenApiOperation(operationId: "greeting", tags: new[] { "greeting" }, Summary = "Greetings", Description = "This shows a welcome message.", Visibility = OpenApiVisibilityType.Important)]
-        //[OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        //[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Summary = "The response", Description = "This returns the response")]
-       
         [Function("getuserinfo")]
-      
         public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",Route = "getuserinfo")] HttpRequestData req,
        FunctionContext executionContext)
         {

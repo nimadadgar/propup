@@ -41,7 +41,7 @@ namespace Cmms
 
 
         [Function("InitialInvite")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",Route = "user/initialInvite")] HttpRequestData req,
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get",Route = "user/initialInvite")] HttpRequestData req,
        FunctionContext executionContext)
         {
             return req.OkResponse(new

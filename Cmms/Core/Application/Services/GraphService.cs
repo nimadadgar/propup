@@ -75,15 +75,7 @@ namespace Cmms.Core.Application.Services
                 return GetCompleteAttributeName("Status");
             }
         }
-       internal  string JobAttribute
-        {
-            get
-            {
-                return GetCompleteAttributeName("Job");
-            }
-        }
-
-
+ 
         internal IGraphServiceUsersCollectionRequest UserRequest(string filter="")
         {
             var request = _client.Users.Request();
@@ -95,7 +87,7 @@ namespace Cmms.Core.Application.Services
 
         internal IGraphServiceUsersCollectionRequest UserSelectRequest(IGraphServiceUsersCollectionRequest request)
         {
-            return request.Select($"" + $"id,displayName,identities,mobilePhone,givenName,surName" + $"{JobAttribute},{LocationAttribute},{AccessLevelsAttribute},{StatusAttribute}");
+            return request.Select($"id,displayName,identities,mobilePhone,givenName,surName,jobTitle," + $"{LocationAttribute},{AccessLevelsAttribute},{StatusAttribute}");
 
 
         }
@@ -114,6 +106,7 @@ namespace Cmms.Core.Application.Services
                 e.DisplayName,
                 e.GivenName,
                 e.Surname,
+                e.JobTitle,
                 e.AdditionalData,
                 e.Identities,
                 e.CompanyName
@@ -145,7 +138,6 @@ namespace Cmms.Core.Application.Services
          
             // Fill custom attributes
             IDictionary<string, object> extensionInstance = new Dictionary<string, object>();
-            extensionInstance.Add(JobAttribute, inviteUser.JobTitle);
             extensionInstance.Add(AccessLevelsAttribute, string.Join(",", inviteUser.AccessLevels)  );
             extensionInstance.Add(LocationAttribute, inviteUser.LocationName);
             extensionInstance.Add(StatusAttribute, "Available");
@@ -156,7 +148,8 @@ namespace Cmms.Core.Application.Services
              {
                  GivenName = inviteUser.FirstName,
                  Surname = inviteUser.SurName,
-                 MobilePhone=inviteUser.MobileNumber,
+                 JobTitle = inviteUser.JobTitle,
+                 MobilePhone =inviteUser.MobileNumber,
                  DisplayName = $"{inviteUser.FirstName} {inviteUser.SurName}",
                  UserType = "Member",
                  Identities = new List<ObjectIdentity>

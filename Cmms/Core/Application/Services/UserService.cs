@@ -59,7 +59,6 @@ namespace Cmms.Core.Application
                 throw new BadRequestException("Invite with this email already exist");
 
 
-
             var accessLevels =await _generalService.GetAccessLevels();
             Job job = await _generalService.GetJobById(user.JobTitle)?? throw new BadRequestException("parameter is wrong");
             Factory factory = await _generalService.GetFactoryById(user.FactoryName) ?? throw new BadRequestException("parameter is wrong");
@@ -111,6 +110,8 @@ namespace Cmms.Core.Application
             var invite = await GetInviteUserById(inviteId);
             if (invite == null)
                 return null;
+            
+            
 
             var userGraph = await _graphServices.GetUserByEmail(invite.Email);
             if (userGraph!=null)
@@ -131,8 +132,12 @@ namespace Cmms.Core.Application
         public async Task<List<UserInfoModelDto>> UserList()
         {
 
+        var Users=   await _context.InvitedUsers.Select(d => UserInfoModelDto.ToUserInfo(d)).ToListAsync();
+
           var result= await _graphServices.GetAllUsers();
-            return result;
+            Users.AddRange(result);
+
+            return Users;
 
 
         }

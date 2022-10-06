@@ -26,14 +26,17 @@ namespace Cmms
         private readonly ILogger _logger;
         private readonly IClaimsPrincipalAccessor _claimsPrincipalAccessor;
         private readonly IUserService _userService;
-
+        private readonly MailSender _mailSender;
         public InviteUser(ILoggerFactory loggerFactory,
             IUserService userService,
+             MailSender mailSender,
             IClaimsPrincipalAccessor claimsPrincipalAccessor)
         {
             _claimsPrincipalAccessor = claimsPrincipalAccessor;
             _logger = loggerFactory.CreateLogger<InviteUser>();
             _userService = userService;
+            _mailSender = mailSender;   
+
 
         }
 
@@ -52,9 +55,16 @@ namespace Cmms
             }
 
             var result = await _userService.AddInvitedUser(requestObject.Value);
+
+           await _mailSender.SendInviteMail(result);
+
+
             return req.OkResponse(new { id = result.Id });
 
         
         }
+
+
+
     }
 }

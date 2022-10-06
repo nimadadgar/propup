@@ -24,14 +24,11 @@ namespace Cmms
     public class AcceptInviteUser
     {
         private readonly ILogger _logger;
-        private readonly IClaimsPrincipalAccessor _claimsPrincipalAccessor;
         private readonly IUserService _userService;
 
         public AcceptInviteUser(ILoggerFactory loggerFactory,
-            IUserService userService,
-            IClaimsPrincipalAccessor claimsPrincipalAccessor)
+            IUserService userService  )
         {
-            _claimsPrincipalAccessor = claimsPrincipalAccessor;
             _logger = loggerFactory.CreateLogger<InviteUser>();
             _userService = userService;
 
@@ -41,7 +38,7 @@ namespace Cmms
 
 
         [Function("AcceptInvite")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "post",Route = "user/acceptinvite")] HttpRequestData req,
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post",Route = "user/acceptinvite")] HttpRequestData req,
        FunctionContext executionContext)
         {
 

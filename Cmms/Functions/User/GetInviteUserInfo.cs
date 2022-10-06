@@ -24,15 +24,12 @@ namespace Cmms
     public class GetInviteUserInfo
     {
         private readonly ILogger _logger;
-        private readonly IClaimsPrincipalAccessor _claimsPrincipalAccessor;
         private readonly IUserService _userService;
 
-        public GetInviteUserInfo(ILoggerFactory loggerFactory,
-            IUserService userService,
-            IClaimsPrincipalAccessor claimsPrincipalAccessor)
+        public GetInviteUserInfo(ILoggerFactory loggerFactory, IUserService userService)
         {
             _logger = loggerFactory.CreateLogger<GetInviteUserInfo>();
-            _claimsPrincipalAccessor = claimsPrincipalAccessor;
+            
             _userService = userService;
         }
 
@@ -40,20 +37,19 @@ namespace Cmms
 
 
         [Function("inviteinfo")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get",Route = "user/inviteinfo/{id}")] 
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",Route = "user/inviteinfo/{id}")] 
         HttpRequestData req,
             Guid id,
        FunctionContext executionContext)
         {
+           
+                var result = await _userService.ProcessGetInviteUser(id);
+                if (result == null)
+                    return req.BadResponse("Invited Link Expired");
 
-            var result = await _userService.ProcessGetInviteUser( id);
-            if (result == null)
-                return req.BadResponse("Invited Link Expired");
 
-
-
-            return req.OkResponse("OK");
-
+                return req.OkResponse("OK");
+            
         
         }
     }
